@@ -67,6 +67,12 @@ Revision: $Rev: 25842 $
 **********************************************************************
 */
 
+unsigned int strlen( const char * str );
+void *memcpy( void * destination, const void * source, unsigned int num );
+void * memset ( void * ptr, int value, unsigned int num );
+
+
+
 #ifndef RTT_USE_ASM
   //
   // Some cores support out-of-order memory accesses (reordering of memory accesses in the core)
@@ -265,8 +271,8 @@ Revision: $Rev: 25842 $
 #endif
 
 #ifndef SEGGER_RTT_ASM  // defined when SEGGER_RTT.h is included from assembly file
-#include <stdlib.h>
-#include <stdarg.h>
+// #include <stdlib.h>
+// #include <stdarg.h>
 
 /*********************************************************************
 *
@@ -420,8 +426,6 @@ int     SEGGER_RTT_TerminalOut        (unsigned char TerminalId, const char* s);
 *
 **********************************************************************
 */
-int SEGGER_RTT_printf(unsigned BufferIndex, const char * sFormat, ...);
-int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pParamList);
 
 #ifdef __cplusplus
   }
