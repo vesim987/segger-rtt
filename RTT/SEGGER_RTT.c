@@ -1238,12 +1238,12 @@ unsigned SEGGER_RTT_Write(unsigned BufferIndex, const void* pBuffer, unsigned Nu
 *    (2) String passed to this function has to be \0 terminated
 *    (3) \0 termination character is *not* stored in RTT buffer
 */
-unsigned SEGGER_RTT_WriteString(unsigned BufferIndex, const char* s) {
-  unsigned Len;
+// unsigned SEGGER_RTT_WriteString(unsigned BufferIndex, const char* s) {
+//   unsigned Len;
 
-  Len = STRLEN(s);
-  return SEGGER_RTT_Write(BufferIndex, s, Len);
-}
+//   Len = STRLEN(s);
+//   return SEGGER_RTT_Write(BufferIndex, s, Len);
+// }
 
 /*********************************************************************
 *
@@ -1973,80 +1973,80 @@ int SEGGER_RTT_SetTerminal (unsigned char TerminalId) {
 *     < 0 - Error.
 *
 */
-int SEGGER_RTT_TerminalOut (unsigned char TerminalId, const char* s) {
-  int                   Status;
-  unsigned              FragLen;
-  unsigned              Avail;
-  SEGGER_RTT_BUFFER_UP* pRing;
-  //
-  INIT();
-  //
-  // Validate terminal ID.
-  //
-  if (TerminalId < (char)sizeof(_aTerminalId)) { // We only support a certain number of channels
-    //
-    // Get "to-host" ring buffer.
-    //
-    pRing = (SEGGER_RTT_BUFFER_UP*)((char*)&_SEGGER_RTT.aUp[0] + SEGGER_RTT_UNCACHED_OFF);  // Access uncached to make sure we see changes made by the J-Link side and all of our changes go into HW directly
-    //
-    // Need to be able to change terminal, write data, change back.
-    // Compute the fixed and variable sizes.
-    //
-    FragLen = STRLEN(s);
-    //
-    // How we output depends upon the mode...
-    //
-    SEGGER_RTT_LOCK();
-    Avail = _GetAvailWriteSpace(pRing);
-    switch (pRing->Flags & SEGGER_RTT_MODE_MASK) {
-    case SEGGER_RTT_MODE_NO_BLOCK_SKIP:
-      //
-      // If we are in skip mode and there is no space for the whole
-      // of this output, don't bother switching terminals at all.
-      //
-      if (Avail < (FragLen + 4u)) {
-        Status = 0;
-      } else {
-        _PostTerminalSwitch(pRing, TerminalId);
-        Status = (int)_WriteBlocking(pRing, s, FragLen);
-        _PostTerminalSwitch(pRing, _ActiveTerminal);
-      }
-      break;
-    case SEGGER_RTT_MODE_NO_BLOCK_TRIM:
-      //
-      // If we are in trim mode and there is not enough space for everything,
-      // trim the output but always include the terminal switch.  If no room
-      // for terminal switch, skip that totally.
-      //
-      if (Avail < 4u) {
-        Status = -1;
-      } else {
-        _PostTerminalSwitch(pRing, TerminalId);
-        Status = (int)_WriteBlocking(pRing, s, (FragLen < (Avail - 4u)) ? FragLen : (Avail - 4u));
-        _PostTerminalSwitch(pRing, _ActiveTerminal);
-      }
-      break;
-    case SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL:
-      //
-      // If we are in blocking mode, output everything.
-      //
-      _PostTerminalSwitch(pRing, TerminalId);
-      Status = (int)_WriteBlocking(pRing, s, FragLen);
-      _PostTerminalSwitch(pRing, _ActiveTerminal);
-      break;
-    default:
-      Status = -1;
-      break;
-    }
-    //
-    // Finish up.
-    //
-    SEGGER_RTT_UNLOCK();
-  } else {
-    Status = -1;
-  }
-  return Status;
-}
+// int SEGGER_RTT_TerminalOut (unsigned char TerminalId, const char* s) {
+//   int                   Status;
+//   unsigned              FragLen;
+//   unsigned              Avail;
+//   SEGGER_RTT_BUFFER_UP* pRing;
+//   //
+//   INIT();
+//   //
+//   // Validate terminal ID.
+//   //
+//   if (TerminalId < (char)sizeof(_aTerminalId)) { // We only support a certain number of channels
+//     //
+//     // Get "to-host" ring buffer.
+//     //
+//     pRing = (SEGGER_RTT_BUFFER_UP*)((char*)&_SEGGER_RTT.aUp[0] + SEGGER_RTT_UNCACHED_OFF);  // Access uncached to make sure we see changes made by the J-Link side and all of our changes go into HW directly
+//     //
+//     // Need to be able to change terminal, write data, change back.
+//     // Compute the fixed and variable sizes.
+//     //
+//     FragLen = STRLEN(s);
+//     //
+//     // How we output depends upon the mode...
+//     //
+//     SEGGER_RTT_LOCK();
+//     Avail = _GetAvailWriteSpace(pRing);
+//     switch (pRing->Flags & SEGGER_RTT_MODE_MASK) {
+//     case SEGGER_RTT_MODE_NO_BLOCK_SKIP:
+//       //
+//       // If we are in skip mode and there is no space for the whole
+//       // of this output, don't bother switching terminals at all.
+//       //
+//       if (Avail < (FragLen + 4u)) {
+//         Status = 0;
+//       } else {
+//         _PostTerminalSwitch(pRing, TerminalId);
+//         Status = (int)_WriteBlocking(pRing, s, FragLen);
+//         _PostTerminalSwitch(pRing, _ActiveTerminal);
+//       }
+//       break;
+//     case SEGGER_RTT_MODE_NO_BLOCK_TRIM:
+//       //
+//       // If we are in trim mode and there is not enough space for everything,
+//       // trim the output but always include the terminal switch.  If no room
+//       // for terminal switch, skip that totally.
+//       //
+//       if (Avail < 4u) {
+//         Status = -1;
+//       } else {
+//         _PostTerminalSwitch(pRing, TerminalId);
+//         Status = (int)_WriteBlocking(pRing, s, (FragLen < (Avail - 4u)) ? FragLen : (Avail - 4u));
+//         _PostTerminalSwitch(pRing, _ActiveTerminal);
+//       }
+//       break;
+//     case SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL:
+//       //
+//       // If we are in blocking mode, output everything.
+//       //
+//       _PostTerminalSwitch(pRing, TerminalId);
+//       Status = (int)_WriteBlocking(pRing, s, FragLen);
+//       _PostTerminalSwitch(pRing, _ActiveTerminal);
+//       break;
+//     default:
+//       Status = -1;
+//       break;
+//     }
+//     //
+//     // Finish up.
+//     //
+//     SEGGER_RTT_UNLOCK();
+//   } else {
+//     Status = -1;
+//   }
+//   return Status;
+// }
 
 /*********************************************************************
 *

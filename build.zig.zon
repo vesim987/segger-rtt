@@ -1,0 +1,6 @@
+.{
+    .name = "segger-rtt",
+    .version = "9.0.0",
+    .paths = .{""},
+    .dependencies = .{},
+}
