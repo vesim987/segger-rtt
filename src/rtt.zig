@@ -38,6 +38,18 @@ const Writer = std.io.Writer(c_uint, WriteError, struct {
 
 var default_log_writter: Writer = .{ .context = 0 };
 
+pub const Time = struct { seconds: u32, microseconds: u32 };
+const Getter = fn () Time;
+fn default_time_getter() Time {
+    return Time{ .seconds = 0, .microseconds = 0 };
+}
+
+var time_getter: *const Getter = default_time_getter;
+
+pub fn set_time_getter(comptime getter: Getter) void {
+    time_getter = getter;
+}
+
 pub fn logFn(
     comptime level: std.log.Level,
     comptime scope: @TypeOf(.EnumLiteral),
@@ -50,16 +62,6 @@ pub fn logFn(
         else => " (" ++ @tagName(scope) ++ "): ",
     };
 
-    // TODO
-    // const current_time = rp2040.time.get_time_since_boot();
-    // const seconds = current_time.to_us() / std.time.us_per_s;
-    // const microseconds = current_time.to_us() % std.time.us_per_s;
-
-    default_log_writter.print(prefix ++ format ++ "\r\n", .{ 0, 0 } ++ args) catch {};
+    const time = time_getter();
+    default_log_writter.print(prefix ++ format ++ "\r\n", .{ time.seconds, time.microseconds } ++ args) catch {};
 }
-
-// const current_time = rp2040.time.get_time_since_boot();
-// const seconds = current_time.to_us() / std.time.us_per_s;
-// const microseconds = current_time.to_us() % std.time.us_per_s;
-
-// (Writer{ .context = {} }).print(prefix ++ format ++ "\r\n", .{ seconds, microseconds } ++ args) catch {};
